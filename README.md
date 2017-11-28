@@ -40,4 +40,4 @@ Thirdly, all runner scripts are also copied into run specific folders for comple
 Eventually the idea is to have other frontends to this underlying store of runs to have querying and displaying capabilities.
 
 ## Dependencies
-jq
+jq, moreutils

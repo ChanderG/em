@@ -42,7 +42,7 @@ function new(){
 
   # setup conf files
   mkdir .experiments/exp/$num
-  jq .id=$num $SHRDIR/exp.conf > .experiments/exp/$num/exp.conf
+  jq .id=$num .times.created="\"$(date)\"" $SHRDIR/exp.conf > .experiments/exp/$num/exp.conf
 
   # update control files
   echo "$num" > .experiments/HEAD
@@ -66,6 +66,8 @@ function setup(){
   $EDITOR .experiments/exp/$num/exp.conf
 
   # do verification here
+
+  jq .times.lastUpdated="\"$(date)\"" .experiments/exp/$num/exp.conf | sponge .experiments/exp/$num/exp.conf
   echo "Updated run $num setup"
 }
 
@@ -135,6 +137,7 @@ function run(){
 
   # finish up
   echo "COMPLETING" > .experiments/STATUS
+  jq .times.run="\"$(date)\"" .experiments/exp/$num/exp.conf | sponge .experiments/exp/$num/exp.conf
 
   echo ""
   echo "Experiment run core complete"
