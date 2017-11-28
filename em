@@ -69,6 +69,65 @@ function setup(){
   echo "Updated run $num setup"
 }
 
+# run the current configuration
+function run(){
+  # ensure curr run is ready
+  status=$(cat .experiments/STATUS)
+  if [ $status != "CONFIGURING" ]; then
+    echo "Current experiment run not in configuration."
+    return
+  fi
+
+  # obtain current run number
+  num=$(cat .experiments/HEAD)
+  conffile=".experiments/exp/$num/exp.conf"
+
+  # prepare run
+  preRun=$(jq -r .pre_run $conffile)
+  run=$(jq -r .run $conffile)
+  postRun=$(jq -r .post_run $conffile)
+  fetch=$(jq -r .fetch $conffile)
+
+  if [ "$run" == "" ]; then
+    echo "Cannot skip run script. Edit conf and try again."
+    return
+  fi
+  if [ "$fetch" == "" ]; then
+    echo "Cannot skip fetch script. Edit conf and try again."
+    return
+  fi
+  # also need to check for existance and exec permissions on these files here
+
+  # prepare environment variables
+  while IFS=$'\t' read -r key value; do
+    eval "export $key=$value"
+  done < <(jq -r '.config | to_entries | .[] | [.key, .value] | @tsv' $conffile)
+
+  # it is run time
+  echo "RUNNING" > .experiments/STATUS
+
+  if [ "$preRun" == "" ]; then
+    echo "Skipping pre run."
+  else
+    ./$preRun
+  fi
+
+  ./$run
+
+  if [ "$postRun" == "" ]; then
+    echo "Skipping post run."
+  else
+    ./$postRun
+  fi
+
+  mkdir outputs/
+
+  ./$fetch
+
+  # finish up
+  echo "COMPLETING" > .experiments/STATUS
+}
+
 function helpfun(){
   echo "em - experiment manager"
 
