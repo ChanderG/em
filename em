@@ -74,7 +74,7 @@ function run(){
   # ensure curr run is ready
   status=$(cat .experiments/STATUS)
   if [ $status != "CONFIGURING" ]; then
-    echo "Current experiment run not in configuration."
+    echo "Current experiment run not in configuration or already run."
     return
   fi
 
@@ -103,29 +103,75 @@ function run(){
     eval "export $key=$value"
   done < <(jq -r '.config | to_entries | .[] | [.key, .value] | @tsv' $conffile)
 
-  # it is run time
+  ### it is run time
+
   echo "RUNNING" > .experiments/STATUS
 
+  # copy runner scripts
+  mkdir .experiments/exp/$num/runners
+
+  # actual runner scripts run now
   if [ "$preRun" == "" ]; then
     echo "Skipping pre run."
   else
     ./$preRun
+    cp $preRun .experiments/exp/$num/runners/
   fi
 
   ./$run
+  cp $run .experiments/exp/$num/runners/
 
   if [ "$postRun" == "" ]; then
     echo "Skipping post run."
   else
     ./$postRun
+    cp $postRun .experiments/exp/$num/runners/
   fi
 
   mkdir outputs/
 
   ./$fetch
+  cp $fetch .experiments/exp/$num/runners/
 
   # finish up
   echo "COMPLETING" > .experiments/STATUS
+
+  echo ""
+  echo "Experiment run core complete"
+  echo "Output available in outputs/"
+}
+
+# end the current run
+function end(){
+  # ensure curr run is done
+  status=$(cat .experiments/STATUS)
+  if [ $status != "COMPLETING" ]; then
+    echo "Current experiment not ready to complete."
+    return
+  fi
+
+  # obtain current run number
+  num=$(cat .experiments/HEAD)
+  conffile=".experiments/exp/$num/exp.conf"
+
+  # chance to fill in the observation
+  $EDITOR $conffile
+
+  # move outputs folder
+  mv outputs .experiments/exp/$num/
+
+  # update status
+  echo NOTSTARTED > .experiments/STATUS
+
+  echo "Experiment run #$num ended"
+}
+
+# print status of the current run
+function status(){
+  echo "Run number: "
+  cat .experiments/HEAD
+  echo "Status: "
+  cat .experiments/STATUS
 }
 
 function helpfun(){
@@ -156,6 +202,8 @@ elif [ "$command" == "run" ]; then
   run
 elif [ "$command" == "end" ]; then
   end
+elif [ "$command" == "status" ]; then
+  status
 elif [ "$command" == "clone" ]; then
   clone
 elif [ "$command" == "show" ]; then
