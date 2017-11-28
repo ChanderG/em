@@ -177,6 +177,33 @@ function status(){
   cat .experiments/STATUS
 }
 
+# clone config of a previous run
+# for now, only the preceeding experiment run
+function clone(){
+  # ensure curr/prev run is over
+  status=$(cat .experiments/STATUS)
+  if [ $status != "NOTSTARTED" ]; then
+    echo "Current experiment run not completed. Cannot go to next run."
+    return
+  fi
+
+  # obtain current run number
+  num=$(cat .experiments/HEAD)
+  prev=$num
+  num=$((num+1))
+
+  # setup conf files
+  mkdir .experiments/exp/$num
+  # blank out as many fields as possible
+  jq ".id=$num | .times.created=\"$(date)\" | .observations=\"\" | .hypothesis=\"\" | .desc=\"\" | .times.lastUpdated=\"\" | .times.run=\"\"" .experiments/exp/$prev/exp.conf > .experiments/exp/$num/exp.conf
+
+  # update control files
+  echo "$num" > .experiments/HEAD
+  echo "CONFIGURING" > .experiments/STATUS
+
+  echo "Created new run config $num based on $prev run#"
+}
+
 function helpfun(){
   echo "em - experiment manager"
 
