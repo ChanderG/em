@@ -10,7 +10,7 @@ SHRDIR="$DIR/../share/em"
 # .experiments/HEAD - last experiment run number
 
 # .experiments/STATUS - status of the current experiment, one of 
-# NOTSTARTED  - not yet started
+# INACTIVE  - not yet started
 # CONFIGURING - after new/clone; under process of configuring
 # RUNNING     - running right now (either setup/actual run)
 # COMPLETING  - run done; waiting for completion/feedback
@@ -22,7 +22,7 @@ function init(){
   mkdir .experiments
   echo "000" > .experiments/HEAD
   mkdir .experiments/exp
-  echo "NOTSTARTED" > .experiments/STATUS
+  echo "INACTIVE" > .experiments/STATUS
 
   echo "Init new repo in $PWD"
 }
@@ -31,7 +31,7 @@ function init(){
 function new(){
   # ensure curr/prev run is over
   status=$(cat .experiments/STATUS)
-  if [ $status != "NOTSTARTED" ]; then
+  if [ $status != "INACTIVE" ]; then
     echo "Current experiment run not completed. Cannot go to next run."
     return
   fi
@@ -163,14 +163,14 @@ function end(){
   mv outputs .experiments/exp/$num/
 
   # update status
-  echo NOTSTARTED > .experiments/STATUS
+  echo INACTIVE > .experiments/STATUS
 
   echo "Experiment run #$num ended"
 }
 
 # print status of the current run
 function status(){
-  echo "Run number: "
+  echo "Last/current run number: "
   cat .experiments/HEAD
   echo "Status: "
   cat .experiments/STATUS
@@ -181,7 +181,7 @@ function status(){
 function clone(){
   # ensure curr/prev run is over
   status=$(cat .experiments/STATUS)
-  if [ $status != "NOTSTARTED" ]; then
+  if [ $status != "INACTIVE" ]; then
     echo "Current experiment run not completed. Cannot go to next run."
     return
   fi
