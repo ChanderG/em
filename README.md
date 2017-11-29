@@ -33,6 +33,8 @@ The chief purpose of this tools it to log as much of the experiments as possible
 
 Firstly, the config for each run is stored - this includes everything from the code version to the hypothesis and observtation fields filled in by the user.
 
+After this, we also record a copy of the outputs of all runner scripts for posterity.
+
 Secondly, everything `fetch` stores is copied into run specific folders to have full record of the outputs and logs for every run.
 
 Thirdly, all runner scripts are also copied into run specific folders for complete control. Note that this a simple implementation for now. Sharing unchanged scripts, using hashes or backing the scripts onto a version control system instead of naive full copying are possible future approaches to do this.
@@ -40,4 +42,4 @@ Thirdly, all runner scripts are also copied into run specific folders for comple
 Eventually the idea is to have other frontends to this underlying store of runs to have querying and displaying capabilities.
 
 ## Dependencies
-jq, moreutils
+jq, moreutils, tee

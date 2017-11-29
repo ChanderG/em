@@ -42,7 +42,7 @@ function new(){
 
   # setup conf files
   mkdir .experiments/exp/$num
-  jq .id=$num .times.created="\"$(date)\"" $SHRDIR/exp.conf > .experiments/exp/$num/exp.conf
+  jq ".id=$num | .times.created=\"$(date)\"" $SHRDIR/exp.conf > .experiments/exp/$num/exp.conf
 
   # update control files
   echo "$num" > .experiments/HEAD
@@ -111,28 +111,27 @@ function run(){
 
   # copy runner scripts
   mkdir .experiments/exp/$num/runners
+  mkdir outputs/
 
   # actual runner scripts run now
   if [ "$preRun" == "" ]; then
     echo "Skipping pre run."
   else
-    ./$preRun
+    ./$preRun | tee outputs/preRun.log
     cp $preRun .experiments/exp/$num/runners/
   fi
 
-  ./$run
+  ./$run | tee outputs/run.log
   cp $run .experiments/exp/$num/runners/
 
   if [ "$postRun" == "" ]; then
     echo "Skipping post run."
   else
-    ./$postRun
+    ./$postRun | tee outputs/postRun.log
     cp $postRun .experiments/exp/$num/runners/
   fi
 
-  mkdir outputs/
-
-  ./$fetch
+  ./$fetch | tee outputs/fetch.log
   cp $fetch .experiments/exp/$num/runners/
 
   # finish up
@@ -195,7 +194,7 @@ function clone(){
   # setup conf files
   mkdir .experiments/exp/$num
   # blank out as many fields as possible
-  jq ".id=$num | .times.created=\"$(date)\" | .observations=\"\" | .hypothesis=\"\" | .desc=\"\" | .times.lastUpdated=\"\" | .times.run=\"\"" .experiments/exp/$prev/exp.conf > .experiments/exp/$num/exp.conf
+  jq ".id=$num | .times.created=\"$(date)\" | .observations=\"\" | .times.lastUpdated=\"\" | .times.run=\"\"" .experiments/exp/$prev/exp.conf > .experiments/exp/$num/exp.conf
 
   # update control files
   echo "$num" > .experiments/HEAD
