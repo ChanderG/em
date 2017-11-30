@@ -1,21 +1,21 @@
 # Experiment manager
 
-Record and control your experiments.
+Order, log and control your experiments.
 
 ## Flow
-An experiment is one repo/ groups of experiments with a common codebase/intention.
+An experiment is one repo/group of experiments with a common codebase/intention.
 
-Experiment runs are iterations of the experiment by changing code and other parameters even the actual expriment scripts.
+Experiment runs are iterations of the experiment by changing code and other parameters, even the actual expriment scripts.
 
 The stages of an experiment run are:
 
 1. Start -> create a conf file which describes the experiment and hooks up the runners as required.
-2. Configure -> edit and set variables and scripts are required
+2. Configure -> edit and set variables and scripts as required
 3. Run -> Automated running of defined scripts
 4. Observe -> Read/Browse/Analyze the outputs of the experiment
 5. End -> End a run by describing the observations and notes. Archive the results/outputs and prepare for the next run.
 
-Experiment runs are controlled using the config files with more or less predefined fields. Some of the config variables are exposed as environment variables for use in thr runner scripts. 
+Experiment runs are controlled using the config files with more or less predefined fields. Some of the config variables are exposed as environment variables for use in the runner scripts. 
 
 Experiment configuration also has fields for hypothesis and observations, where the purpose of the experiment and the results are to be documented.
 
@@ -37,9 +37,11 @@ After this, we also record a copy of the outputs of all runner scripts for poste
 
 Secondly, everything `fetch` stores is copied into run specific folders to have full record of the outputs and logs for every run.
 
-Thirdly, all runner scripts are also copied into run specific folders for complete control. Note that this a simple implementation for now. Sharing unchanged scripts, using hashes or backing the scripts onto a version control system instead of naive full copying are possible future approaches to do this.
+Thirdly, all runner scripts are also copied into run specific folders for complete control. Note that this is a simple implementation for now. Sharing unchanged scripts, using hashes or backing the scripts onto a version control system instead of naive full copying are possible future approaches to do this.
 
-Eventually the idea is to have other frontends to this underlying store of runs to have querying and displaying capabilities.
+## Interface
+
+Eventually the idea is to have other frontends to this underlying store to have interaction, querying and displaying capabilities.
 
 ## Dependencies
 jq, moreutils, tee
