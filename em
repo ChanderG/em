@@ -117,21 +117,21 @@ function run(){
   if [ "$preRun" == "" ]; then
     echo "Skipping pre run."
   else
-    ./$preRun | tee outputs/preRun.log
+    ./$preRun |& tee outputs/preRun.log
     cp $preRun .experiments/exp/$num/runners/
   fi
 
-  ./$run | tee outputs/run.log
+  ./$run |& tee outputs/run.log
   cp $run .experiments/exp/$num/runners/
 
   if [ "$postRun" == "" ]; then
     echo "Skipping post run."
   else
-    ./$postRun | tee outputs/postRun.log
+    ./$postRun |& tee outputs/postRun.log
     cp $postRun .experiments/exp/$num/runners/
   fi
 
-  ./$fetch | tee outputs/fetch.log
+  ./$fetch |& tee outputs/fetch.log
   cp $fetch .experiments/exp/$num/runners/
 
   # finish up
