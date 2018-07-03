@@ -1,0 +1,1 @@
+complete -W "init new setup run end status clone show" em
